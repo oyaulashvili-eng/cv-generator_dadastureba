@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import LandingPage from './components/LandingPage';
-import PersonalInfo from './components/PersonalInfoTemp';
+import PersonalInfo from './components/PersonalInfo';
 import Experience from './components/Experience';
 
 function App() {
