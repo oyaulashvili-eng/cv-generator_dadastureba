@@ -4,11 +4,42 @@ import { updateField } from '../store/resumeSlice';
 
 const Experience = ({ onNext, onBack }) => {
   const dispatch = useDispatch();
-  const formData = useSelector((state) => state.resume);
+  const formData = useSelector((state) => state.resume || {});
+
+  // 1. თანამდებობის ვალიდაცია (მინიმუმ 2 სიმბოლო)
+  const isPositionValid = Boolean(formData.position && formData.position.trim().length >= 2);
+
+  // 2. დამსაქმებლის ვალიდაცია (მინიმუმ 2 სიმბოლო)
+  const isEmployerValid = Boolean(formData.employer && formData.employer.trim().length >= 2);
+
+  // 3. დაწყების თარიღის ვალიდაცია
+  const isStartDateValid = Boolean(formData.startDate);
+
+  // 4. დამთავრების თარიღის ვალიდაცია
+  const isEndDateValid = Boolean(formData.endDate);
+
+  // 5. აღწერის ვალიდაცია (არასავალდებულო/სავალდებულო შემოწმება)
+  const isDescriptionValid = Boolean(formData.experienceDescription && formData.experienceDescription.trim().length >= 2);
+
+  // დამხმარე ფუნქცია ჩარჩოს (Border) ფერის გამოსათვლელად
+  const getBorderStyle = (value, isValid) => {
+    if (!value) return '1px solid #ccc'; // ცარიელია - სტანდარტული
+    return isValid ? '2px solid #22c55e' : '2px solid #ef4444'; // მწვანე ან წითელი
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     dispatch(updateField({ field: name, value }));
+  };
+
+  // შემდეგ ეტაპზე გადასვლისას შემოწმება
+  const handleNextStep = () => {
+    // ვამოწმებთ ყველა სავალდებულო ველს
+    if (isPositionValid && isEmployerValid && isStartDateValid && isEndDateValid && isDescriptionValid) {
+      if (onNext) onNext();
+    } else {
+      alert('გთხოვთ, შეავსოთ გამოცდილების ყველა სავალდებულო ველი სწორად (მინიმუმ 2 სიმბოლო და თარიღები)!');
+    }
   };
 
   return (
@@ -23,67 +54,122 @@ const Experience = ({ onNext, onBack }) => {
 
         {/* თანამდებობა */}
         <div style={{ marginBottom: '20px' }}>
-          <label style={{ fontWeight: 'bold', display: 'block' }}>თანამდებობა</label>
+          <label style={{ fontWeight: 'bold', display: 'block', fontSize: '14px' }}>თანამდებობა</label>
           <input
             type="text"
             name="position"
-            value={formData.position}
+            value={formData.position || ''}
             onChange={handleChange}
             placeholder="დეველოპერი, დიზაინერი, ა.შ."
-            style={{ width: '100%', padding: '10px', marginTop: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
+            style={{
+              width: '100%',
+              padding: '10px',
+              marginTop: '8px',
+              borderRadius: '4px',
+              outline: 'none',
+              boxSizing: 'border-box',
+              border: getBorderStyle(formData.position, isPositionValid)
+            }}
           />
-          <small style={{ color: '#666', display: 'block', marginTop: '4px' }}>მინიმუმ 2 სიმბოლო</small>
+          <small style={{ 
+            color: formData.position ? (isPositionValid ? '#16a34a' : '#dc2626') : '#666', 
+            display: 'block', 
+            marginTop: '4px',
+            fontSize: '11px' 
+          }}>
+            მინიმუმ 2 სიმბოლო
+          </small>
         </div>
 
         {/* დამსაქმებელი */}
         <div style={{ marginBottom: '20px' }}>
-          <label style={{ fontWeight: 'bold', display: 'block' }}>დამსაქმებელი</label>
+          <label style={{ fontWeight: 'bold', display: 'block', fontSize: '14px' }}>დამსაქმებელი</label>
           <input
             type="text"
             name="employer"
-            value={formData.employer}
+            value={formData.employer || ''}
             onChange={handleChange}
             placeholder="დამსაქმებელი"
-            style={{ width: '100%', padding: '10px', marginTop: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
+            style={{
+              width: '100%',
+              padding: '10px',
+              marginTop: '8px',
+              borderRadius: '4px',
+              outline: 'none',
+              boxSizing: 'border-box',
+              border: getBorderStyle(formData.employer, isEmployerValid)
+            }}
           />
-          <small style={{ color: '#666', display: 'block', marginTop: '4px' }}>მინიმუმ 2 სიმბოლო</small>
+          <small style={{ 
+            color: formData.employer ? (isEmployerValid ? '#16a34a' : '#dc2626') : '#666', 
+            display: 'block', 
+            marginTop: '4px',
+            fontSize: '11px' 
+          }}>
+            მინიმუმ 2 სიმბოლო
+          </small>
         </div>
 
         {/* თარიღები */}
         <div style={{ display: 'flex', gap: '20px', marginBottom: '20px' }}>
           <div style={{ flex: 1 }}>
-            <label style={{ fontWeight: 'bold', display: 'block' }}>დაწყების რიცხვი</label>
+            <label style={{ fontWeight: 'bold', display: 'block', fontSize: '14px' }}>დაწყების რიცხვი</label>
             <input
               type="date"
               name="startDate"
-              value={formData.startDate}
+              value={formData.startDate || ''}
               onChange={handleChange}
-              style={{ width: '100%', padding: '10px', marginTop: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
+              style={{
+                width: '100%',
+                padding: '10px',
+                marginTop: '8px',
+                borderRadius: '4px',
+                outline: 'none',
+                boxSizing: 'border-box',
+                border: getBorderStyle(formData.startDate, isStartDateValid)
+              }}
             />
           </div>
 
           <div style={{ flex: 1 }}>
-            <label style={{ fontWeight: 'bold', display: 'block' }}>დამთავრების რიცხვი</label>
+            <label style={{ fontWeight: 'bold', display: 'block', fontSize: '14px' }}>დამთავრების რიცხვი</label>
             <input
               type="date"
               name="endDate"
-              value={formData.endDate}
+              value={formData.endDate || ''}
               onChange={handleChange}
-              style={{ width: '100%', padding: '10px', marginTop: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
+              style={{
+                width: '100%',
+                padding: '10px',
+                marginTop: '8px',
+                borderRadius: '4px',
+                outline: 'none',
+                boxSizing: 'border-box',
+                border: getBorderStyle(formData.endDate, isEndDateValid)
+              }}
             />
           </div>
         </div>
 
         {/* აღწერა */}
         <div style={{ marginBottom: '20px' }}>
-          <label style={{ fontWeight: 'bold', display: 'block' }}>აღწერა</label>
+          <label style={{ fontWeight: 'bold', display: 'block', fontSize: '14px' }}>აღწერა</label>
           <textarea
             name="experienceDescription"
-            value={formData.experienceDescription}
+            value={formData.experienceDescription || ''}
             onChange={handleChange}
             placeholder="როლი თანამდებობაზე და ზოგადი აღწერა"
             rows={4}
-            style={{ width: '100%', padding: '10px', marginTop: '8px', borderRadius: '4px', border: '1px solid #ccc', resize: 'vertical' }}
+            style={{
+              width: '100%',
+              padding: '10px',
+              marginTop: '8px',
+              borderRadius: '4px',
+              outline: 'none',
+              resize: 'vertical',
+              boxSizing: 'border-box',
+              border: getBorderStyle(formData.experienceDescription, isDescriptionValid)
+            }}
           />
         </div>
 
@@ -108,6 +194,7 @@ const Experience = ({ onNext, onBack }) => {
         {/* ღილაკები: უკან და შემდეგი */}
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
           <button
+            type="button"
             onClick={onBack}
             style={{
               backgroundColor: '#6b7080',
@@ -123,7 +210,8 @@ const Experience = ({ onNext, onBack }) => {
           </button>
 
           <button
-            onClick={onNext}
+            type="button"
+            onClick={handleNextStep}
             style={{
               backgroundColor: '#6b7080',
               color: '#fff',
@@ -161,11 +249,13 @@ const Experience = ({ onNext, onBack }) => {
               </p>
               {(formData.startDate || formData.endDate) && (
                 <p style={{ fontSize: '12px', color: '#888', margin: '0 0 8px 0' }}>
-                  {formData.startDate} - {formData.endDate}
+                  {formData.startDate} {formData.endDate && `- ${formData.endDate}`}
                 </p>
               )}
               {formData.experienceDescription && (
-                <p style={{ fontSize: '13px', color: '#555', lineHeight: '1.4' }}>{formData.experienceDescription}</p>
+                <p style={{ fontSize: '13px', color: '#555', lineHeight: '1.4', whitespace: 'pre-line' }}>
+                  {formData.experienceDescription}
+                </p>
               )}
             </div>
           )}
